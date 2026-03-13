@@ -1,13 +1,14 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { supabase } from "@/lib/superbase"; // Fixed typo from superbase
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SystxLogo } from "@/components/ui/SystxLogo";
-import { Lock, Mail, ArrowRight, Loader2 } from "lucide-react";
+import { Lock, Mail, ArrowRight, Loader2, Eye, EyeOff } from "lucide-react";
 
-export default function AuthPage() {
+function AuthContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [showPassword, setShowPassword] = useState(false);
   
   // Initialize mode based on URL, default to login
   const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -22,44 +23,38 @@ export default function AuthPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  
   const handleAuth = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setLoading(true);
-  setError('');
+    e.preventDefault();
+    setLoading(true);
+    setError('');
 
-  try {
-    if (mode === 'register') {
-      const { error } = await supabase.auth.signUp({ 
-        email, 
-        password,
-        options: { emailRedirectTo: `${window.location.origin}/auth/callback` }
-      });
-      if (error) throw error;
-      alert("INITIALIZATION_COMPLETE: Check email.");
-    } else {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      
-      if (error) throw error;
-
-      if (data.session) {
-        // 1. Tell the router to refresh its data
-        router.refresh();
+    try {
+      if (mode === 'register') {
+        const { error } = await supabase.auth.signUp({ 
+          email, 
+          password,
+          options: { emailRedirectTo: `${window.location.origin}/auth/callback` }
+        });
+        if (error) throw error;
+        alert("INITIALIZATION_COMPLETE: Check email.");
+      } else {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         
-        // 2. Give the browser a tiny moment to write the cookies to disk
-        setTimeout(() => {
-          // 3. Use window.location for a "hard" jump to the dashboard
-          // This forces the middleware to see the fresh cookies
-          window.location.href = '/dashboard';
-        }, 500);
+        if (error) throw error;
+
+        if (data.session) {
+          router.refresh();
+          setTimeout(() => {
+            window.location.href = '/dashboard';
+          }, 500);
+        }
       }
+    } catch (err: any) {
+      setError(`[ AUTH_ERROR: ${err.message.toUpperCase()} ]`);
+    } finally {
+      setLoading(false);
     }
-  } catch (err: any) {
-    setError(`[ AUTH_ERROR: ${err.message.toUpperCase()} ]`);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div className="min-h-screen bg-[#050505] flex items-center justify-center px-6 selection:bg-emerald-500/30">
@@ -92,12 +87,19 @@ export default function AuthPage() {
               <div className="relative group">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-emerald-500 transition-colors" size={14} />
                 <input 
-                  type="password" 
+                  type={showPassword ? "text" : "password"} 
                   required
                   placeholder="••••••••"
-                  className="w-full bg-black/50 border border-zinc-800 p-3 pl-10 text-xs font-mono text-white outline-none focus:border-emerald-500/50 transition-all placeholder:text-zinc-700"
+                  className="w-full bg-black/50 border border-zinc-800 p-3 pl-10 pr-12 text-xs font-mono text-white outline-none focus:border-emerald-500/50 transition-all placeholder:text-zinc-700"
                   onChange={(e) => setPassword(e.target.value)}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-600 hover:text-emerald-500 transition-colors"
+                >
+                  {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                </button>
               </div>
             </div>
 
@@ -133,5 +135,14 @@ export default function AuthPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Wrap in Suspense to satisfy Next.js Build Requirements
+export default function AuthPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black" />}>
+      <AuthContent />
+    </Suspense>
   );
 }
