@@ -8,7 +8,7 @@ import { Phone, Mail, MapPin, Twitter, Facebook, Instagram, Linkedin } from "luc
 export default function ContactsPage() {
   const contacts = [
     { icon: <Phone size={18} />, text: "+254 716 700 151" },
-    { icon: <Mail size={18} />, text: "info@codecinecreations.co.ke" },
+    { icon: <Mail size={18} />, text: "info@.co.ke" },
     { icon: <MapPin size={18} />, text: "Meru, Kenya" }
   ];
 
