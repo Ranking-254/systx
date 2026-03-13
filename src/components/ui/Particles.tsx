@@ -35,8 +35,8 @@ export const Particles = () => {
       density: number;
 
       constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
+        this.x = Math.random() * canvas!.width;
+        this.y = Math.random() * canvas!.height;
         this.baseX = this.x;
         this.baseY = this.y;
         this.vx = (Math.random() - 0.5) * 0.4;
@@ -49,8 +49,8 @@ export const Particles = () => {
         this.baseX += this.vx;
         this.baseY += this.vy;
 
-        if (this.baseX < 0 || this.baseX > canvas.width) this.vx *= -1;
-        if (this.baseY < 0 || this.baseY > canvas.height) this.vy *= -1;
+        if (this.baseX < 0 || this.baseX > canvas!.width) this.vx *= -1;
+        if (this.baseY < 0 || this.baseY > canvas!.height) this.vy *= -1;
 
         let dx = mouse.current.x - this.x;
         let dy = mouse.current.y - this.y;
