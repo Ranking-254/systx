@@ -1,26 +1,42 @@
 @import "tailwindcss";
 
+@theme {
+  --color-background: var(--bg);
+  --color-foreground: var(--fg);
+  --color-primary: var(--primary);
+  --color-accent: var(--accent);
+  --color-card: var(--card-bg);
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #F8FAFC;
+  --fg: #0F172A;
+  --primary: #3B82F6; 
+  --card-bg: #FFFFFF;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  --bg: #0F172A;
+  --fg: #F8FAFC;
+  --card-bg: #1F2937;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Tools Page: Cyber Cyan Theme */
+.theme-tools {
+  --bg-color: #0f172a;
+  --primary-color: #22d3ee; /* Cyan */
+  --accent-color: #818cf8;
 }
 
+
+.theme-contact {
+  --bg: #064e3b !important;
+  --fg: #ffffff !important;
+  --primary: #10b981 !important;
+}
+
+/* Apply the background variable to the root of the page */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg);
+  color: var(--fg);
 }
