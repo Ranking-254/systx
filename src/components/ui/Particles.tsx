@@ -8,18 +8,19 @@ export const Particles = () => {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d", { alpha: false }); // Optimization: disable alpha transparency for canvas context
+    const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) return;
 
-    let particles: Particle[] = [];
-    // We drop back to a high-but-sane count for performance
+    let particles: any[] = []; // Using any here to bypass class-scope TS issues
     const particleCount = 280; 
     let animationFrameId: number;
 
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      init();
+      if (canvas) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        init();
+      }
     };
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -27,30 +28,28 @@ export const Particles = () => {
       mouse.current.y = e.clientY;
     };
 
-    class Particle {
-      x: number; y: number;
-      baseX: number; baseY: number;
-      vx: number; vy: number;
-      size: number;
-      density: number;
-
-      constructor() {
-        this.x = Math.random() * canvas!.width;
-        this.y = Math.random() * canvas!.height;
+    // Define Particle as an object factory instead of a class to avoid constructor scope issues
+    const createParticle = () => ({
+      x: Math.random() * (canvas?.width || window.innerWidth),
+      y: Math.random() * (canvas?.height || window.innerHeight),
+      baseX: 0,
+      baseY: 0,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      size: Math.random() * 2 + 1.2,
+      density: (Math.random() * 30) + 10,
+      init() {
         this.baseX = this.x;
         this.baseY = this.y;
-        this.vx = (Math.random() - 0.5) * 0.4;
-        this.vy = (Math.random() - 0.5) * 0.4;
-        this.size = Math.random() * 2 + 1.2; // Keep them big so they are visible
-        this.density = (Math.random() * 30) + 10;
-      }
-
+      },
       update() {
         this.baseX += this.vx;
         this.baseY += this.vy;
 
-        if (this.baseX < 0 || this.baseX > canvas!.width) this.vx *= -1;
-        if (this.baseY < 0 || this.baseY > canvas!.height) this.vy *= -1;
+        if (canvas) {
+          if (this.baseX < 0 || this.baseX > canvas.width) this.vx *= -1;
+          if (this.baseY < 0 || this.baseY > canvas.height) this.vy *= -1;
+        }
 
         let dx = mouse.current.x - this.x;
         let dy = mouse.current.y - this.y;
@@ -62,22 +61,29 @@ export const Particles = () => {
           this.x -= (dx / distance) * force * this.density;
           this.y -= (dy / distance) * force * this.density;
         } else {
-          // Snap back logic
           this.x -= (this.x - this.baseX) / 12;
           this.y -= (this.y - this.baseY) / 12;
         }
-      }
-
+      },
       draw() {
-        ctx!.fillStyle = "#10b981"; // Use hex instead of rgba for faster fill
-        ctx!.beginPath();
-        ctx!.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx!.fill();
+        if (!ctx) return;
+        ctx.fillStyle = "#10b981";
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
       }
-    }
+    });
+
+    const init = () => {
+      particles = [];
+      for (let i = 0; i < particleCount; i++) {
+        const p = createParticle();
+        p.init();
+        particles.push(p);
+      }
+    };
 
     const connect = () => {
-      // Optimization: We only check connections for every 2nd particle to cut calculations by 50%
       for (let a = 0; a < particles.length; a += 2) { 
         for (let b = a; b < particles.length; b++) {
           let dx = particles[a].x - particles[b].x;
@@ -96,16 +102,10 @@ export const Particles = () => {
       }
     };
 
-    const init = () => {
-      particles = [];
-      for (let i = 0; i < particleCount; i++) {
-        particles.push(new Particle());
-      }
-    };
-
     const animate = () => {
-      // Faster clear
-      ctx.fillStyle = "#050505"; // Match your background exactly
+      if (!canvas || !ctx) return;
+      // We check theme here or use a safe dark clear
+      ctx.fillStyle = "#050505"; 
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
       particles.forEach(p => {
