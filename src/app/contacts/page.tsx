@@ -75,7 +75,7 @@ export default function ContactsPage() {
             </div>
             
             {/* The Light Variant of our shared ContactForm */}
-            <ContactForm variant="light" />
+            <ContactForm />
           </div>
         </div>
 
