@@ -8,10 +8,12 @@ export const Particles = () => {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    
+    // Optimization: disable alpha transparency for canvas context
     const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) return;
 
-    let particles: any[] = []; // Using any here to bypass class-scope TS issues
+    let particles: any[] = []; 
     const particleCount = 280; 
     let animationFrameId: number;
 
@@ -28,7 +30,7 @@ export const Particles = () => {
       mouse.current.y = e.clientY;
     };
 
-    // Define Particle as an object factory instead of a class to avoid constructor scope issues
+    // Factory function to ensure canvas references are scoped correctly for TS
     const createParticle = () => ({
       x: Math.random() * (canvas?.width || window.innerWidth),
       y: Math.random() * (canvas?.height || window.innerHeight),
@@ -38,10 +40,12 @@ export const Particles = () => {
       vy: (Math.random() - 0.5) * 0.4,
       size: Math.random() * 2 + 1.2,
       density: (Math.random() * 30) + 10,
+      
       init() {
         this.baseX = this.x;
         this.baseY = this.y;
       },
+      
       update() {
         this.baseX += this.vx;
         this.baseY += this.vy;
@@ -65,9 +69,10 @@ export const Particles = () => {
           this.y -= (this.y - this.baseY) / 12;
         }
       },
+      
       draw() {
         if (!ctx) return;
-        ctx.fillStyle = "#10b981";
+        ctx.fillStyle = "#10b981"; // Emerald-500
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
@@ -104,8 +109,11 @@ export const Particles = () => {
 
     const animate = () => {
       if (!canvas || !ctx) return;
-      // We check theme here or use a safe dark clear
-      ctx.fillStyle = "#050505"; 
+      
+      // Theme Check: Ensures the canvas background swaps color with the site
+      const isDark = document.documentElement.classList.contains('dark');
+      ctx.fillStyle = isDark ? "#050505" : "#ffffff"; 
+      
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
       particles.forEach(p => {
