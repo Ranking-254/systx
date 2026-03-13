@@ -34,6 +34,11 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   console.log(`PATH: ${request.nextUrl.pathname} | USER_FOUND: ${!!user}`)
+  // Inside middleware.ts
+if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
+    return NextResponse.redirect(new URL('/auth', request.url))
+}
+// This allows everything else (like /services) to pass through!
 
   // 1. If trying to access dashboard and NOT logged in -> REDIRECT TO AUTH
   if (request.nextUrl.pathname.startsWith('/dashboard') && !user) {
