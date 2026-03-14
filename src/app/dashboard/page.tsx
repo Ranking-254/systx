@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { supabase } from "@/lib/superbase"; 
+import { useRouter } from 'next/navigation'; // Added for the guard
 import { Navbar } from "@/components/layout/Navbar";
 import { 
   Terminal, Database, Users, LogOut, Mail, 
@@ -8,22 +9,52 @@ import {
 } from "lucide-react";
 
 export default function Dashboard() {
+  const router = useRouter();
   const [leads, setLeads] = useState<any[]>([]);
   const [bookings, setBookings] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'leads' | 'bookings'>('leads');
   const [loading, setLoading] = useState(true);
+  const [authorized, setAuthorized] = useState(false); // Guard state
 
   useEffect(() => {
+    const checkAdminAccess = async () => {
+      // 1. Get current session
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        router.push('/login');
+        return;
+      }
+
+      // 2. Verify admin role in profiles
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+      if (profile?.role !== 'admin') {
+        router.push('/portal'); // Kick non-admins to the portal
+      } else {
+        setAuthorized(true); // Allow admin to see the content
+      }
+    };
+
+    checkAdminAccess();
+  }, [router]);
+
+  useEffect(() => {
+    // Only run data fetching if the user is authorized as an admin
+    if (!authorized) return;
+
     const fetchData = async () => {
       setLoading(true);
       
-      // Fetch General Leads
       const { data: leadsData } = await supabase
         .from('leads')
         .select('*')
         .order('created_at', { ascending: false });
 
-      // Fetch Service Bookings
       const { data: bookingsData } = await supabase
         .from('bookings')
         .select('*')
@@ -36,7 +67,6 @@ export default function Dashboard() {
 
     fetchData();
 
-    // Realtime listener for BOTH tables
     const channel = supabase.channel('dashboard-uplink')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'leads' }, 
         payload => setLeads(prev => [payload.new, ...prev]))
@@ -45,7 +75,7 @@ export default function Dashboard() {
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, []);
+  }, [authorized]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -60,6 +90,20 @@ export default function Dashboard() {
       else setBookings(bookings.filter(b => b.id !== id));
     }
   };
+
+  // Guard: Show loading state until authorization is confirmed
+  if (!authorized) {
+    return (
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="animate-spin text-emerald-500" size={24} />
+          <p className="text-zinc-500 font-mono text-[10px] uppercase tracking-[0.5em] animate-pulse">
+            Verifying_Authorization...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#050505] text-white pt-24 px-6 pb-12 selection:bg-emerald-500/30">

@@ -2,14 +2,13 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, Clock, User, Mail, Phone, X, ArrowRight, Laptop, Camera, Megaphone, Briefcase, Loader2 } from 'lucide-react';
-import { supabase } from "@/lib/superbase"; // Ensure this path is correct
+import { supabase } from "@/lib/superbase"; 
 
 export default function ServicesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
 
-  // Form State
   const [formData, setFormData] = useState({
     service: '',
     date: '',
@@ -34,15 +33,18 @@ export default function ServicesPage() {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Engagement sequence messages
     const sequence = ["INITIALIZING_UPLINK...", "ENCRYPTING_DATA...", "COMMITTING_TO_DATABASE...", "DEPLOYMENT_SUCCESSFUL"];
     
     for (let msg of sequence) {
       setStatusMessage(msg);
-      await new Promise(res => setTimeout(res, 800)); // Small delay for effect
+      await new Promise(res => setTimeout(res, 800)); 
     }
 
     try {
+      // 1. GET CURRENT LOGGED IN USER
+      const { data: { user } } = await supabase.auth.getUser();
+
+      // 2. INSERT WITH USER_ID LINK
       const { error } = await supabase
         .from('bookings')
         .insert([{ 
@@ -51,7 +53,8 @@ export default function ServicesPage() {
           preferred_time: formData.time,
           full_name: formData.name,
           email: formData.email,
-          phone: formData.phone
+          phone: formData.phone,
+          user_id: user?.id // THE MAGIC LINK: If they are logged in, we tag the booking
         }]);
 
       if (error) throw error;
