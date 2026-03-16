@@ -34,7 +34,7 @@ export default function AboutUsPage() {
             [ VISION_MANIFEST ]
           </p>
           <h1 className="text-5xl md:text-8xl font-black tracking-tighter uppercase italic leading-[0.8]">
-            <TypingEffect text="SYSTX//DIGITAL_INFRA" /> <br/> 
+            <TypingEffect text=">_SYSTX//DIGITAL_INFRA" /> <br/> 
             <span className="text-foreground drop-shadow-[0_0_20px_var(--primary-glow)]">Architecting Digital Infrastructure.</span>
           </h1>
           <p className="max-w-xl text-zinc-500 font-mono text-sm leading-relaxed pt-4">

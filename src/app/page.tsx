@@ -210,7 +210,7 @@ export default function Home() {
       {/* FLOATING_COMMUNICATIONS_LAYER */}
       <div className="fixed bottom-8 w-full px-8 z-[90] pointer-events-none flex justify-between items-end">
         <a 
-          href="https://wa.me/254716700151"
+          href="https://wa.me/254716700151?text=Hello%20SYSTX%20Team%2C%20I%20would%20like%20to%20inquire%20about%20your%20services"
           target="_blank"
           rel="noopener noreferrer"
           className="pointer-events-auto group relative flex items-center justify-center w-12 h-12 bg-[#25D366]/10 border border-[#25D366]/20 rounded-full hover:bg-[#25D366] transition-all duration-500 shadow-[0_0_15px_rgba(37,211,102,0.1)] hover:shadow-[0_0_20px_rgba(37,211,102,0.4)]"
