@@ -384,13 +384,19 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {[
-              { name: "Next.js", category: "Frontend", level: "98%" },
-              { name: "TypeScript", category: "Language", level: "100%" },
-              { name: "PostgreSQL", category: "Database", level: "94%" },
-              { name: "AWS", category: "Cloud", level: "88%" },
-              { name: "Docker", category: "DevOps", level: "90%" },
-              { name: "Tailwind", category: "Styling", level: "95%" },
+           {[
+              { name: "Next.js", category: "Framework", level: "98%" },
+            { name: "TypeScript", category: "Architecture", level: "100%" },
+             { name: "PostgreSQL", category: "Relational_DB", level: "94%" },
+            { name: "MongoDB", category: "NoSQL_MERN", level: "98%" },
+            { name: "Node.js", category: "Backend_MERN", level: "95%" },
+            { name: "Express", category: "Middleware", level: "90%" },
+            { name: "React", category: "Library", level: "98%" },
+            { name: "Supabase", category: "Realtime_BAAS", level: "96%" },
+            { name: "AWS", category: "Cloud_Infra", level: "88%" },
+            { name: "Docker", category: "Containerization", level: "90%" },
+            { name: "Framer_Motion", category: "Animations", level: "94%" },
+            { name: "Tailwind", category: "UI_Styling", level: "95%" },
             ].map((tech, i) => (
               <LiquidTechCard key={i} tech={tech} index={i} />
             ))}

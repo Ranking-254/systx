@@ -195,7 +195,7 @@ export default function TermsPage() {
           </div>
           <div className="flex gap-6">
             <Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
-            <Link href="/careers" className="hover:text-primary transition-colors">Careers</Link>
+            <Link href="/Careers" className="hover:text-primary transition-colors">Careers</Link>
           </div>
         </div>
       </footer>
