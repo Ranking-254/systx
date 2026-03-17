@@ -489,7 +489,7 @@ export default function Home() {
                   {[
                     { label: "Infrastructure Deployment", value: 92, color: "bg-primary" },
                     { label: "Security Audit", value: 100, color: "bg-emerald-500" },
-                    { label: "API Integration", value: 78, color: "bg-accent" },
+                    { label: "API Integration", value: 78, color: "bg-yellow-500" },
                     { label: "UI/UX Polish", value: 65, color: "bg-purple-500" }
                   ].map((item, i) => (
                     <div key={i} className="space-y-2">
