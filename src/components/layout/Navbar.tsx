@@ -3,24 +3,24 @@
 import React, { useEffect, useState } from 'react';
 import { SystxLogo } from "../ui/SystxLogo";
 import { supabase } from "@/lib/superbase"; 
+import { UserDrawer } from "./UserDrawer"; // 1. Import the new drawer
 import {
   Lock, ChevronRight, Sun, Moon,
   ChevronDown, Code, Camera, Monitor, Smartphone, Palette,
-  Menu, X, LayoutDashboard, LogOut
+  Menu, X, LayoutDashboard
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 
 export const Navbar = () => {
   const pathname = usePathname();
-  const router = useRouter();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMobileServicesOpen, setIsMobileServicesOpen] = useState(false); // Sub-menu state
+  const [isMobileServicesOpen, setIsMobileServicesOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
@@ -38,13 +38,6 @@ export const Navbar = () => {
     setIsMobileMenuOpen(false);
     setIsMobileServicesOpen(false);
   }, [pathname]);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setIsMobileMenuOpen(false);
-    router.push('/');
-    router.refresh();
-  };
 
   const navLinkStyle = (path: string) => `
     relative text-[10px] uppercase tracking-widest transition-all duration-300 flex items-center gap-1
@@ -84,7 +77,6 @@ export const Navbar = () => {
       <div className="flex items-center gap-6">
         <div className="hidden md:flex items-center gap-8">
           <Link href="/" className={navLinkStyle('/')}>Home</Link>
-          
           <div
             className="relative"
             onMouseEnter={() => setIsDropdownOpen(true)}
@@ -145,9 +137,8 @@ export const Navbar = () => {
                 <Link href="/portal" className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-emerald-500 border border-emerald-500/20 bg-emerald-500/5 px-3 py-1.5 rounded-sm hover:bg-emerald-500/10 transition-all">
                   <LayoutDashboard size={10} /> Dashboard
                 </Link>
-                <button onClick={handleLogout} className="bg-zinc-900 dark:bg-white text-white dark:text-black px-5 py-2.5 font-bold text-[10px] uppercase tracking-tighter hover:bg-red-500 transition-all duration-300 rounded-sm flex items-center gap-2">
-                  Logout <LogOut size={14} />
-                </button>
+                {/* 2. ADD THE DRAWER COMPONENT HERE */}
+                <UserDrawer /> 
               </>
             ) : (
               <>
@@ -177,8 +168,6 @@ export const Navbar = () => {
               
               <div className="flex flex-col gap-4">
                 <Link href="/" className="text-2xl font-black italic uppercase tracking-tighter">Home</Link>
-                
-                {/* --- MOBILE SERVICES ACCORDION --- */}
                 <div className="flex flex-col">
                   <button 
                     onClick={() => setIsMobileServicesOpen(!isMobileServicesOpen)}
@@ -219,9 +208,10 @@ export const Navbar = () => {
                     <Link href="/portal" className="flex items-center justify-center gap-2 w-full py-4 bg-emerald-500 text-black font-black text-[10px] uppercase tracking-[0.2em] rounded-lg">
                       <LayoutDashboard size={14} /> Dashboard
                     </Link>
-                    <button onClick={handleLogout} className="flex items-center justify-center gap-2 w-full py-4 border border-red-500/20 text-red-500 font-mono text-[10px] uppercase tracking-[0.2em] rounded-lg">
-                      <LogOut size={14} /> Logout
-                    </button>
+                    {/* 3. ALSO UPDATE MOBILE VIEW FOR CONSISTENCY */}
+                    <div className="flex justify-center py-2">
+                       <UserDrawer />
+                    </div>
                   </>
                 ) : (
                   <>
